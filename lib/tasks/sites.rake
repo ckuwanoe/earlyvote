@@ -16,4 +16,9 @@ namespace :sites do
   task :import_small_biz => :environment do
     Site.import_csv("db/import/small_biz.csv")
   end
+
+  desc "importing in polling place sites csv"
+  task :import_polling_places => :environment do
+    PollingPlace.import_csv("db/import/polling_places-clark.csv")
+  end
 end

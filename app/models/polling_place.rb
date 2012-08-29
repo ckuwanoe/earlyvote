@@ -1,6 +1,6 @@
 class PollingPlace < ActiveRecord::Base
-  has_one :precinct, :foreign_key => "precinct_number"
-  has_one :team, :through => :precinct
+  has_many :precincts
+  has_many :teams, :through => :precincts
 
   acts_as_gmappable :lat => "lat", :lng => "lng"
 
@@ -10,12 +10,12 @@ class PollingPlace < ActiveRecord::Base
   # store the fetched address in the full_address attribute
   reverse_geocoded_by :lat, :lng, :address => :gmaps4rails_address
 
-  validates :lat, :presence => true
+  validates :lat, :presence => true, :uniqueness => {:scope => :lng, :message => "Address already exists or address is not valid. Please double check your values."}
   validates :lng, :presence => true
 
   before_create :populate_precinct_from_gis
 
-  attr_accessible :site_name, :street_address, :city, :state, :zipcode, :county
+  attr_accessible :site_name, :street_address, :city, :state, :zipcode, :county, :precinct_number_located_in
   require 'csv'
 
   def gmaps4rails_address
@@ -25,15 +25,20 @@ class PollingPlace < ActiveRecord::Base
   def self.import_csv(file)
     f = File.new('tmp/import.log', "w")
     CSV.parse(File.open(file, "r:ISO-8859-1") )[1..-1].each do |row|
-      import_site_name = row[0]
-      import_street_address = row[1]
-      import_city = row[2]
-      import_state = row[3]
-      import_zipcode = row[4]
-      import_county = row[5]
-      puts "creating #{row[0]}\n"
-      self.create!(:site_name => import_site_name, :street_address => import_street_address, :city => import_city,
-        :state => import_state, :zipcode => import_zipcode, :county => import_county)
+      import_id = row[0]
+      import_site_name= row[1].titleize
+      unless row[1] == 'MAILING PRECINCT'
+        import_street_address = row[2].titleize
+        import_city = row[3].titleize
+        import_state = row[4]
+        import_zipcode = row[5]
+        import_precinct_number = row[6]
+        puts "creating #{row[1]}\n"
+        polling_place = self.find_or_create_by_id_and_site_name_and_street_address_and_city_and_state_and_zipcode(import_id, import_site_name,import_street_address,import_city,
+          import_state,import_zipcode)
+        precinct = Precinct.find_by_precinct_number_and_county(import_precinct_number, 'Clark')
+        precinct.update_attributes!(:polling_place_id => polling_place.id)
+      end
       sleep 2
     end
   end
@@ -46,7 +51,7 @@ class PollingPlace < ActiveRecord::Base
       if point.present?
         sql = "SELECT prec AS precinct_number, county FROM #{self.state.downcase}_gis_shapefiles WHERE ST_Contains(geom, ST_Transform(ST_GeomFromText('POINT(#{point[1]} #{point[0]})', 4326), 3421)) = 't';"
         tmp = self.class.find_by_sql(sql)
-        self.precinct_number = tmp.first.precinct_number
+        self.precinct_number_located_in = tmp.first.precinct_number
         self.county = tmp.first.county
       end
   end

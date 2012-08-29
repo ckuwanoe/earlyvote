@@ -1,6 +1,7 @@
 class EarlyVoteSite < ActiveRecord::Base
   has_one :precinct, :foreign_key => "precinct_number"
   has_one :team, :through => :precinct
+  has_many :early_vote_site_dates
 
   acts_as_gmappable :lat => "lat", :lng => "lng"
 
@@ -35,6 +36,25 @@ class EarlyVoteSite < ActiveRecord::Base
       self.create!(:site_name => import_site_name, :street_address => import_street_address, :city => import_city,
         :state => import_state, :zipcode => import_zipcode, :county => import_county)
       sleep 2
+    end
+  end
+
+  def self.import_update_with_dates(file)
+    f = File.new('tmp/import.log', "w")
+    CSV.parse(File.open(file, "r:ISO-8859-1") )[1..-1].each do |row|
+      import_site_name = row[0]
+      import_street_address = row[2]
+      import_city = row[3]
+      import_state = row[4]
+      import_zipcode = row[5]
+      import_county = row[6]
+      import_date = row[7]
+      import_time_open = row[8]
+      import_time_close = row[9]
+      puts "updating #{row[0]}\n"
+      early_vote_site = self.find_or_create_by_site_name_and_street_address_and_city_and_state_and_zipcode_and_county!(
+        :site_name => import_site_name, :street_address => import_street_address, :city => import_city,
+        :state => import_state, :zipcode => import_zipcode, :county => import_county)
     end
   end
 

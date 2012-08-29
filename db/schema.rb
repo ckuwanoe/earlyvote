@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120823004010) do
+ActiveRecord::Schema.define(:version => 20120823004842) do
 
   create_table "early_vote_sites", :force => true do |t|
     t.string   "site_name"
@@ -49,13 +49,13 @@ ActiveRecord::Schema.define(:version => 20120823004010) do
     t.string   "city"
     t.string   "state"
     t.string   "zipcode"
-    t.integer  "precinct_number"
+    t.integer  "precinct_number_located_in"
     t.string   "county"
     t.float    "lat"
     t.float    "lng"
     t.boolean  "gmaps"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "precinct_scores", :force => true do |t|
