@@ -11,7 +11,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120823004842) do
+ActiveRecord::Schema.define(:version => 20120829031901) do
+
+  create_table "early_vote_site_dates", :force => true do |t|
+    t.integer  "early_vote_site_id"
+    t.date     "date"
+    t.time     "time_open",          :limit => 6
+    t.time     "time_close",         :limit => 6
+    t.integer  "gotv_t1_count",                   :default => 0
+    t.integer  "gotv_t2_count",                   :default => 0
+    t.integer  "gotv_t3_count",                   :default => 0
+    t.integer  "gotv_new_reg_count",              :default => 0
+    t.datetime "created_at",                                     :null => false
+    t.datetime "updated_at",                                     :null => false
+  end
 
   create_table "early_vote_sites", :force => true do |t|
     t.string   "site_name"
@@ -131,7 +144,37 @@ ActiveRecord::Schema.define(:version => 20120823004842) do
     t.datetime "updated_at",   :null => false
   end
 
+  create_table "voter_dates", :force => true do |t|
+    t.integer  "voter_id"
+    t.date     "date"
+    t.integer  "early_vote_site_radius_count", :default => 0
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
+  end
+
   create_table "voters", :force => true do |t|
+    t.string   "state_code"
+    t.integer  "van_id",                       :limit => 8
+    t.float    "lat"
+    t.float    "lng"
+    t.string   "gotv_tier"
+    t.integer  "early_vote_site_radius_count",              :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "voters_old", :force => true do |t|
+    t.string   "state_code"
+    t.integer  "van_id"
+    t.float    "lat"
+    t.float    "lng"
+    t.string   "gotv_tier"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "voters_older", :id => false, :force => true do |t|
+    t.integer  "id",         :null => false
     t.string   "state_code"
     t.integer  "van_id"
     t.float    "lat"

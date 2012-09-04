@@ -16,7 +16,6 @@ class PollingPlace < ActiveRecord::Base
   before_create :populate_precinct_from_gis
 
   attr_accessible :site_name, :street_address, :city, :state, :zipcode, :county, :precinct_number_located_in
-  require 'csv'
 
   def gmaps4rails_address
     "#{self.street_address}, #{self.city}, #{self.state}, #{self.zipcode}"

@@ -5,10 +5,10 @@ class CreateEarlyVoteSiteDates < ActiveRecord::Migration
       t.date :date
       t.timestamp :time_open
       t.timestamp :time_close
-      t.integer :gotv_t1_count
-      t.integer :gotv_t2_count
-      t.integer :gotv_t3_count
-      t.integer :gotv_new_reg_count
+      t.integer :gotv_t1_count, default: 0
+      t.integer :gotv_t2_count, default: 0
+      t.integer :gotv_t3_count, default: 0
+      t.integer :gotv_new_reg_count, default: 0
       t.timestamps
     end
   end
