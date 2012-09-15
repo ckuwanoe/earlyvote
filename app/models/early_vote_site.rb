@@ -51,13 +51,13 @@ class EarlyVoteSite < ActiveRecord::Base
       if (distance <= distance_threshold)
         if voter.gotv_tier.present?
           case voter.gotv_tier
-          when "GOTV_T1"
+          when "Tier1"
             gotv_t1 += 1
-          when "GOTV_T2"
+          when "Tier2"
             gotv_t2 += 1
-          when "GOTV_T3"
+          when "Tier3"
             gotv_t3 += 1
-          when "GOTV_Supp"
+          when "NewReg"
             gotv_supp += 1
           end
         end

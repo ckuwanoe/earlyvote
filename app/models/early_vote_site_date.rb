@@ -39,52 +39,53 @@ class EarlyVoteSiteDate < ActiveRecord::Base
     gotv_t2 = 0
     gotv_t3 = 0
     gotv_new_reg = 0
-    distance_threshold = 2.5
-    voters = Voter.where("lat IS NOT NULL AND lng IS NOT NULL")
+    distance_threshold = 2.0
+    voters = Voter.where("lat IS NOT NULL AND lng IS NOT NULL AND gotv_tier IS NOT NULL")
     existing_voters = []
     voters.each do |voter|
       distance = Geocoder::Calculations.distance_between([self.early_vote_site.lat, self.early_vote_site.lng], [voter.lat, voter.lng])
-#      if (distance <= distance_threshold)
-#        voters_date = VotersDate.find_or_create_by_voter_id_and_date(:voter_id => voter.id, :date => self.date)
-#        if voter.gotv_tier.present?
-#          case voter.gotv_tier
-#          when "Tier1"
-#            gotv_t1 += 1
-#            radius_count = voters_date.early_vote_site_radius_count + 1
-#            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
-#          when "Tier2"
-#            gotv_t2 += 1
-#            radius_count = voters_date.early_vote_site_radius_count + 1
-#            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
-#          when "Tier3"
-#            gotv_t3 += 1
-#            radius_count = voters_date.early_vote_site_radius_count + 1
-#            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
-#          when "NewReg"
-#            gotv_new_reg += 1
-#            radius_count = voters_date.early_vote_site_radius_count + 1
-#            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
-#          end
-#        end
-#      end
       if (distance <= distance_threshold)
-        unless existing_voters.include?(voter.id)
-          existing_voters << voter.id
-          if voter.gotv_tier.present?
-            case voter.gotv_tier
-            when "Tier1"
-              gotv_t1 += 1
-            when "Tier2"
-              gotv_t2 += 1
-            when "Tier3"
-              gotv_t3 += 1
-            when "NewReg"
-              gotv_new_reg += 1
-            end
+       voters_date = VotersDate.find_or_create_by_voter_id_and_date(:voter_id => voter.id, :date => self.date)
+        if voter.gotv_tier.present?
+          case voter.gotv_tier
+          when "Tier1"
+            gotv_t1 += 1
+            radius_count = voters_date.early_vote_site_radius_count + 1
+            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
+          when "Tier2"
+            gotv_t2 += 1
+            radius_count = voters_date.early_vote_site_radius_count + 1
+            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
+          when "Tier3"
+            gotv_t3 += 1
+            radius_count = voters_date.early_vote_site_radius_count + 1
+            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
+          when "NewReg"
+            gotv_new_reg += 1
+            radius_count = voters_date.early_vote_site_radius_count + 1
+            voters_date.update_attributes!(:early_vote_site_radius_count => radius_count)
           end
         end
       end
-    end
+#      if (distance <= distance_threshold)
+#        unless existing_voters.include?(voter.id)
+#          existing_voters << voter.id
+#          if voter.gotv_tier.present?
+#            case voter.gotv_tier
+#            when "Tier1"
+#              gotv_t1 += 1
+#            when "Tier2"
+#              gotv_t2 += 1
+#            when "Tier3"
+#              gotv_t3 += 1
+#            when "NewReg"
+#              gotv_new_reg += 1
+#            end
+#          end
+#        end
+#      end
+#    end
+     end
     self.update_attributes!(:gotv_t1_count => gotv_t1, :gotv_t2_count => gotv_t2, :gotv_t3_count => gotv_t3, :gotv_new_reg_count => gotv_new_reg)
   end
 end
